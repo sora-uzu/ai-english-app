@@ -1,6 +1,6 @@
 
 import { Head } from "@inertiajs/react";
-import { Button } from "flowbite-react";
+import { LogoutButton } from "../Components/LogoutButton";
 import { SideMenu } from "../Components/SideMenu";
 
 const GRID_ROWS = 7;
@@ -20,13 +20,7 @@ export default function Top({ user }) {
                         <span className="text-lg font-semibold text-gray-200">
                             {userName}
                         </span>
-                        <Button
-                            color="light"
-                            pill
-                            className="bg-gray-200 px-6 py-2 text-lg font-semibold text-gray-900 shadow-md transition hover:bg-gray-300"
-                        >
-                            ログアウト
-                        </Button>
+                        <LogoutButton />
                     </div>
 
                     <section className="mt-12">
