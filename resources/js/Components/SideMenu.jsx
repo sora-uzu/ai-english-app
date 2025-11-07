@@ -5,6 +5,19 @@ const threads = [
     "英会話スレッド2",
     "英会話スレッド3",
     "英会話スレッド4",
+    "英会話スレッド5",
+    "英会話スレッド6",
+    "英会話スレッド7",
+    "英会話スレッド8",
+    "英会話スレッド9",
+    "英会話スレッド10",
+    "英会話スレッド11",
+    "英会話スレッド12",
+    "英会話スレッド13",
+    "英会話スレッド14",
+    "英会話スレッド15",
+    "英会話スレッド16",
+    "英会話スレッド17",
 ];
 
 const iconBaseClasses = "flex-shrink-0";
@@ -39,7 +52,7 @@ const PlusCircleIcon = ({ className = "" }) => (
 
 export function SideMenu() {
     return (
-        <aside className="flex w-72 min-h-screen flex-col bg-green-700 text-white">
+        <aside className="flex w-72 h-screen flex-col overflow-hidden bg-green-700 text-white">
             <div className="flex items-center gap-3 px-6 py-7 border-b border-green-600">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-900/50">
                     <ChatBubbleIcon className="h-7 w-7 text-white" />
@@ -61,7 +74,7 @@ export function SideMenu() {
                 </button>
             </div>
 
-            <nav className="flex flex-1 flex-col gap-2 px-4 pb-6">
+            <nav className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 pb-6">
                 {threads.map((thread) => (
                     <button
                         key={thread}

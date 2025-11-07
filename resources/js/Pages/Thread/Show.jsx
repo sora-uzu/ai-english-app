@@ -9,6 +9,26 @@ export default function ThreadShow({ user }) {
         { id: 1, role: "user", text: "Hello." },
         { id: 2, role: "ai", text: "How are you?" },
         { id: 3, role: "user", text: "I'm doing great, thank you!" },
+        { id: 2, role: "ai", text: "How are you?" },
+        { id: 3, role: "user", text: "I'm doing great, thank you!" },
+        { id: 2, role: "ai", text: "How are you?" },
+        { id: 3, role: "user", text: "I'm doing great, thank you!" },
+        { id: 2, role: "ai", text: "How are you?" },
+        { id: 3, role: "user", text: "I'm doing great, thank you!" },
+        { id: 2, role: "ai", text: "How are you?" },
+        { id: 3, role: "user", text: "I'm doing great, thank you!" },
+        { id: 2, role: "ai", text: "How are you?" },
+        { id: 3, role: "user", text: "I'm doing great, thank you!" },
+        { id: 2, role: "ai", text: "How are you?" },
+        { id: 3, role: "user", text: "I'm doing great, thank you!" },
+        { id: 2, role: "ai", text: "How are you?" },
+        { id: 3, role: "user", text: "I'm doing great, thank you!" },
+        { id: 2, role: "ai", text: "How are you?" },
+        { id: 3, role: "user", text: "I'm doing great, thank you!" },
+        { id: 2, role: "ai", text: "How are you?" },
+        { id: 3, role: "user", text: "I'm doing great, thank you!" },
+        { id: 2, role: "ai", text: "How are you?" },
+        { id: 3, role: "user", text: "I'm doing great, thank you!" },
     ];
 
     return (
@@ -16,7 +36,7 @@ export default function ThreadShow({ user }) {
             <Head title="Thread Show" />
             <div className="flex min-h-screen bg-gray-900">
                 <SideMenu />
-                <main className="relative flex flex-1 flex-col bg-gray-800 px-10 py-12 text-white">
+                <main className="relative flex h-screen flex-1 flex-col overflow-hidden bg-gray-800 px-10 py-12 text-white">
                     <header className="flex items-center justify-end gap-4">
                         {userName && (
                             <span className="text-lg font-semibold text-gray-200">
@@ -58,16 +78,16 @@ export default function ThreadShow({ user }) {
                                                 <div className="flex items-center gap-2">
                                                     <button
                                                         aria-label="再生する"
-                                                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-800 shadow-sm shadow-black/10 transition hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-white/60"
-                                                    type="button"
-                                                >
-                                                    <FiVolume2
-                                                        aria-hidden="true"
-                                                        className="h-5 w-5"
-                                                    />
-                                                </button>
-                                                <button
-                                                    className="rounded-2xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm shadow-black/10 transition hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-white/60"
+                                                        className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-800 shadow-sm shadow-black/10 transition hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-white/60"
+                                                        type="button"
+                                                    >
+                                                        <FiVolume2
+                                                            aria-hidden="true"
+                                                            className="h-5 w-5"
+                                                        />
+                                                    </button>
+                                                    <button
+                                                        className="rounded-2xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm shadow-black/10 transition hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-white/60"
                                                         type="button"
                                                     >
                                                         Aあ
@@ -82,7 +102,7 @@ export default function ThreadShow({ user }) {
                     </section>
                     <button
                         aria-label="音声入力"
-                        className="absolute bottom-10 right-10 flex h-16 w-16 items-center justify-center rounded-full bg-white text-gray-900 shadow-xl shadow-black/30 transition hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-400/60"
+                        className="fixed bottom-10 right-10 flex h-16 w-16 items-center justify-center rounded-full bg-white text-gray-900 shadow-xl shadow-black/30 transition hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-400/60"
                         type="button"
                     >
                         <FiMic
