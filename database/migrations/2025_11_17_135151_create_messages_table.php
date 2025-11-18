@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('thread_id')->constrained()->cascadeOnDelete();
+            $table->text('message_en');
+            $table->text('message_ja');
+            $table->unsignedTinyInteger('sender')->comment('1:user 2:AI');
+            $table->string('audio_file_path')->nullable();
             $table->timestamps();
         });
     }
