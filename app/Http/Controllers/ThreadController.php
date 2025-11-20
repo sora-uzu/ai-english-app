@@ -7,6 +7,7 @@ use App\Http\Requests\StoreThreadRequest;
 use Inertia\Response as InertiaResponse;
 use App\Http\Requests\UpdateThreadRequest;
 use App\Models\Thread;
+use App\Models\Message;
 
 class ThreadController extends Controller
 {
@@ -41,10 +42,22 @@ class ThreadController extends Controller
     /**
      * 英会話画面表示
      */
-    public function show(Thread $thread)
+    public function show(int $threadId)
     {
         return Inertia::render('Thread/Show', [
             'threads' => Thread::select(['id', 'title'])
+                ->latest()
+                ->get(),
+            'messages' => Message::select([
+                'id',
+                'thread_id',
+                'message_en',
+                'message_ja',
+                'sender',
+                'audio_file_path',
+                'created_at',
+            ])
+                ->where('thread_id', $threadId)
                 ->latest()
                 ->get(),
         ]);
