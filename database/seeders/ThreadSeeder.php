@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Thread;
 
@@ -23,7 +22,34 @@ class ThreadSeeder extends Seeder
             'title' => '英会話の勉強',
         ]);
         Thread::create([
-            'title' => '英会話の練習',
+            'title' => '英会話のスレッド1',
+        ]);
+        Thread::create([
+            'title' => '英会話のスレッド2',
+        ]);
+        Thread::create([
+            'title' => '英会話のスレッド3',
+        ]);
+        Thread::create([
+            'title' => '英会話のスレッド4',
+        ]);
+        Thread::create([
+            'title' => '英会話のスレッド5',
+        ]);
+        Thread::create([
+            'title' => '英会話のスレッド6',
+        ]);
+        Thread::create([
+            'title' => '英会話のスレッド7',
+        ]);
+        Thread::create([
+            'title' => '英会話のスレッド8',
+        ]);
+        Thread::create([
+            'title' => '英会話のスレッド9',
+        ]);
+        Thread::create([
+            'title' => '英会話のスレッド10',
         ]);
     }
 }
