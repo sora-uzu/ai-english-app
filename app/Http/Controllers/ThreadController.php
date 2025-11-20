@@ -15,7 +15,11 @@ class ThreadController extends Controller
      */
     public function index(): InertiaResponse
     {
-        return Inertia::render('Top');
+        return Inertia::render('Top', [
+            'threads' => Thread::select(['id', 'title'])
+                ->latest()
+                ->get(),
+        ]);
     }
 
     /**
@@ -39,7 +43,11 @@ class ThreadController extends Controller
      */
     public function show(Thread $thread)
     {
-        return Inertia::render('Thread/Show');
+        return Inertia::render('Thread/Show', [
+            'threads' => Thread::select(['id', 'title'])
+                ->latest()
+                ->get(),
+        ]);
     }
 
     /**

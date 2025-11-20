@@ -3,7 +3,7 @@ import { FiMic, FiVolume2 } from "react-icons/fi";
 import { LogoutButton } from "../../Components/LogoutButton";
 import { SideMenu } from "../../Components/SideMenu";
 
-export default function ThreadShow({ user }) {
+export default function ThreadShow({ user, threads = [] }) {
     const userName = user?.name;
     const demoMessages = [
         { id: 1, role: "user", text: "Hello." },
@@ -35,7 +35,7 @@ export default function ThreadShow({ user }) {
         <>
             <Head title="Thread Show" />
             <div className="flex min-h-screen bg-gray-900">
-                <SideMenu />
+                <SideMenu threads={threads} />
                 <main className="relative flex h-screen flex-1 flex-col overflow-hidden bg-gray-800 px-10 py-12 text-white">
                     <header className="flex items-center justify-end gap-4">
                         {userName && (

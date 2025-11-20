@@ -7,14 +7,14 @@ const GRID_ROWS = 7;
 const GRID_COLS = 12;
 const highlightedCells = new Set(["0-10", "0-11", "1-11"]);
 
-export default function Top({ user }) {
+export default function Top({ user, threads = [] }) {
     const userName = user?.name ?? "ゲスト";
 
     return (
         <>
             <Head title="Top" />
             <div className="flex min-h-screen bg-gray-900">
-                <SideMenu />
+                <SideMenu threads={threads} />
                 <main className="flex flex-1 flex-col bg-gray-800 px-10 py-12 text-white">
                     <div className="flex items-center justify-end gap-4">
                         <span className="text-lg font-semibold text-gray-200">

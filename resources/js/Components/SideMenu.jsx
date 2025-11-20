@@ -1,25 +1,5 @@
 "use client";
 
-const threads = [
-    "英会話スレッド1",
-    "英会話スレッド2",
-    "英会話スレッド3",
-    "英会話スレッド4",
-    "英会話スレッド5",
-    "英会話スレッド6",
-    "英会話スレッド7",
-    "英会話スレッド8",
-    "英会話スレッド9",
-    "英会話スレッド10",
-    "英会話スレッド11",
-    "英会話スレッド12",
-    "英会話スレッド13",
-    "英会話スレッド14",
-    "英会話スレッド15",
-    "英会話スレッド16",
-    "英会話スレッド17",
-];
-
 const iconBaseClasses = "flex-shrink-0";
 
 const ChatBubbleIcon = ({ className = "" }) => (
@@ -50,7 +30,7 @@ const PlusCircleIcon = ({ className = "" }) => (
     </svg>
 );
 
-export function SideMenu() {
+export function SideMenu({ threads = [] }) {
     return (
         <aside className="flex w-72 h-screen flex-col overflow-hidden bg-green-700 text-white">
             <div className="flex items-center gap-3 px-6 py-7 border-b border-green-600">
@@ -75,18 +55,24 @@ export function SideMenu() {
             </div>
 
             <nav className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 pb-6">
-                {threads.map((thread) => (
-                    <button
-                        key={thread}
-                        type="button"
-                        className="flex items-center gap-3 rounded-full px-5 py-3 text-left text-base font-semibold transition hover:bg-green-800/80 focus:outline-none focus:ring-2 focus:ring-white/60"
-                    >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-800/70">
-                            <ChatBubbleIcon className="h-6 w-6 text-white/90" />
-                        </div>
-                        <span>{thread}</span>
-                    </button>
-                ))}
+                {threads.length > 0 ? (
+                    threads.map((thread) => (
+                        <button
+                            key={thread.id}
+                            type="button"
+                            className="flex items-center gap-3 rounded-full px-5 py-3 text-left text-base font-semibold transition hover:bg-green-800/80 focus:outline-none focus:ring-2 focus:ring-white/60"
+                        >
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-800/70">
+                                <ChatBubbleIcon className="h-6 w-6 text-white/90" />
+                            </div>
+                            <span>{thread.title}</span>
+                        </button>
+                    ))
+                ) : (
+                    <p className="px-5 py-3 text-sm text-white/70">
+                        スレッドがまだありません
+                    </p>
+                )}
             </nav>
         </aside>
     );
