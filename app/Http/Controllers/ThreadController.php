@@ -8,6 +8,7 @@ use Inertia\Response as InertiaResponse;
 use App\Http\Requests\UpdateThreadRequest;
 use App\Models\Thread;
 use App\Models\Message;
+use Illuminate\Http\RedirectResponse;
 
 class ThreadController extends Controller
 {
@@ -34,9 +35,15 @@ class ThreadController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreThreadRequest $request)
+    public function store(StoreThreadRequest $request): RedirectResponse
     {
-        //
+        $title = $request->input('title');
+        $timestamp = now('Asia/Tokyo')->format('Y-m-d H:i');
+        $thread = Thread::create([
+            'title' => $title ?: '新規スレッド ' . $timestamp,
+        ]);
+
+        return redirect()->route('thread.show', $thread->id);
     }
 
     /**

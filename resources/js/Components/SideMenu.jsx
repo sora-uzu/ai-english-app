@@ -1,6 +1,6 @@
 "use client";
 
-import { Link } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 
 const iconBaseClasses = "flex-shrink-0";
 
@@ -33,6 +33,18 @@ const PlusCircleIcon = ({ className = "" }) => (
 );
 
 export function SideMenu({ threads = [] }) {
+    const { post, processing } = useForm();
+
+    const handleCreateThread = () => {
+        if (processing) {
+            return;
+        }
+
+        post(route("thread.store"), {
+            preserveScroll: true,
+        });
+    };
+
     return (
         <aside className="flex w-72 h-screen flex-col overflow-hidden bg-green-700 text-white">
             <div className="flex items-center gap-3 px-6 py-7 border-b border-green-600">
@@ -47,7 +59,14 @@ export function SideMenu({ threads = [] }) {
             <div className="px-6 py-5">
                 <button
                     type="button"
-                    className="flex w-full items-center gap-3 rounded-full bg-green-900/70 px-5 py-3 text-left text-lg font-semibold transition hover:bg-green-800"
+                    className={`flex w-full items-center gap-3 rounded-full px-5 py-3 text-left text-lg font-semibold transition ${
+                        processing
+                            ? "cursor-not-allowed bg-green-900/40 opacity-60"
+                            : "bg-green-900/70 hover:bg-green-800"
+                    }`}
+                    onClick={handleCreateThread}
+                    disabled={processing}
+                    aria-disabled={processing}
                 >
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-800">
                         <PlusCircleIcon className="h-6 w-6 text-white" />
