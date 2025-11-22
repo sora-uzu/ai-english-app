@@ -1,5 +1,7 @@
 "use client";
 
+import { Link } from "@inertiajs/react";
+
 const iconBaseClasses = "flex-shrink-0";
 
 const ChatBubbleIcon = ({ className = "" }) => (
@@ -57,16 +59,16 @@ export function SideMenu({ threads = [] }) {
             <nav className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 pb-6">
                 {threads.length > 0 ? (
                     threads.map((thread) => (
-                        <button
+                        <Link
                             key={thread.id}
-                            type="button"
+                            href={route("thread.show", thread.id)}
                             className="flex items-center gap-3 rounded-full px-5 py-3 text-left text-base font-semibold transition hover:bg-green-800/80 focus:outline-none focus:ring-2 focus:ring-white/60"
                         >
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-800/70">
                                 <ChatBubbleIcon className="h-6 w-6 text-white/90" />
                             </div>
                             <span>{thread.title}</span>
-                        </button>
+                        </Link>
                     ))
                 ) : (
                     <p className="px-5 py-3 text-sm text-white/70">
