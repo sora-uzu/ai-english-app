@@ -80,7 +80,7 @@ export function SideMenu({ threads = [] }) {
                     threads.map((thread) => (
                         <Link
                             key={thread.id}
-                            href={route("thread.show", thread.id)}
+                            href={route("thread.show", { threadId: thread.id })}
                             className="flex items-center gap-3 rounded-full px-5 py-3 text-left text-base font-semibold transition hover:bg-green-800/80 focus:outline-none focus:ring-2 focus:ring-white/60"
                         >
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-800/70">

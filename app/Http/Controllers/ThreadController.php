@@ -43,7 +43,7 @@ class ThreadController extends Controller
             'title' => $title ?: '新規スレッド ' . $timestamp,
         ]);
 
-        return redirect()->route('thread.show', $thread->id);
+        return redirect()->route('thread.show', ['threadId' => $thread->id]);
     }
 
     /**
@@ -67,6 +67,7 @@ class ThreadController extends Controller
                 ->where('thread_id', $threadId)
                 ->latest()
                 ->get(),
+            'threadId' => $threadId,
         ]);
     }
 
