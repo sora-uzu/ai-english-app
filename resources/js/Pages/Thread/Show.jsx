@@ -1,11 +1,112 @@
+import { useRef, useState } from "react";
+import axios from "axios";
 import { Head } from "@inertiajs/react";
 import { FiMic, FiVolume2 } from "react-icons/fi";
 import { LogoutButton } from "../../Components/LogoutButton";
 import { SideMenu } from "../../Components/SideMenu";
 
-export default function ThreadShow({ user, threads = [], messages = [] }) {
+export default function ThreadShow({
+    user,
+    threads = [],
+    messages = [],
+    threadId,
+}) {
     const userName = user?.name;
     const hasMessages = messages?.length > 0;
+    const [isRecording, setIsRecording] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [recordingError, setRecordingError] = useState("");
+    const mediaRecorderRef = useRef(null);
+    const audioChunksRef = useRef([]);
+
+    const uploadRecording = async () => {
+        if (!threadId || audioChunksRef.current.length === 0) {
+            return;
+        }
+
+        const audioBlob = new Blob(audioChunksRef.current, {
+            type: "audio/webm",
+        });
+        const file = new File([audioBlob], "recording.webm", {
+            type: "audio/webm",
+        });
+        const formData = new FormData();
+        formData.append("audio", file);
+
+        try {
+            setIsUploading(true);
+            setRecordingError("");
+            await axios.post(`/thread/${threadId}/message`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+        } catch (error) {
+            console.error("音声のアップロードに失敗しました", error);
+            setRecordingError("音声のアップロードに失敗しました");
+        } finally {
+            setIsUploading(false);
+            audioChunksRef.current = [];
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current) {
+            mediaRecorderRef.current.stop();
+        }
+    };
+
+    const startRecording = async () => {
+        if (
+            typeof window === "undefined" ||
+            typeof window.MediaRecorder === "undefined" ||
+            !navigator?.mediaDevices?.getUserMedia
+        ) {
+            setRecordingError("このブラウザでは録音がサポートされていません。");
+            return;
+        }
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+            });
+            audioChunksRef.current = [];
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunksRef.current.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                stream.getTracks().forEach((track) => track.stop());
+                setIsRecording(false);
+                uploadRecording();
+            };
+
+            mediaRecorder.start();
+            setRecordingError("");
+            setIsRecording(true);
+        } catch (error) {
+            console.error("録音を開始できませんでした", error);
+            setRecordingError("録音の開始に失敗しました。");
+        }
+    };
+
+    const handleMicClick = () => {
+        if (isUploading) {
+            return;
+        }
+
+        if (isRecording) {
+            stopRecording();
+            return;
+        }
+
+        startRecording();
+    };
 
     return (
         <>
@@ -112,7 +213,14 @@ export default function ThreadShow({ user, threads = [], messages = [] }) {
                     </section>
                     <button
                         aria-label="音声入力"
-                        className="fixed bottom-10 right-10 flex h-16 w-16 items-center justify-center rounded-full bg-white text-gray-900 shadow-xl shadow-black/30 transition hover:scale-105 focus:outline-none focus:ring-4 focus:ring-emerald-400/60"
+                        aria-pressed={isRecording}
+                        className={`fixed bottom-10 right-10 flex h-16 w-16 items-center justify-center rounded-full shadow-xl shadow-black/30 transition focus:outline-none focus:ring-4 focus:ring-emerald-400/60 ${
+                            isRecording
+                                ? "bg-red-500 text-white animate-pulse"
+                                : "bg-white text-gray-900 hover:scale-105"
+                        } ${isUploading ? "opacity-70" : ""}`}
+                        disabled={isUploading}
+                        onClick={handleMicClick}
                         type="button"
                     >
                         <FiMic
@@ -120,6 +228,11 @@ export default function ThreadShow({ user, threads = [], messages = [] }) {
                             className="h-7 w-7"
                         />
                     </button>
+                    {recordingError && (
+                        <p className="fixed bottom-28 right-10 rounded-md bg-red-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-black/30">
+                            {recordingError}
+                        </p>
+                    )}
                 </main>
             </div>
         </>
