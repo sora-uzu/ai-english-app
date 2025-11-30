@@ -41,6 +41,7 @@ export default function ThreadShow({
                     "Content-Type": "multipart/form-data",
                 },
             });
+            window.location.reload();
         } catch (error) {
             console.error("音声のアップロードに失敗しました", error);
             setRecordingError("音声のアップロードに失敗しました");
