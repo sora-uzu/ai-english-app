@@ -16,7 +16,7 @@ class MessageController extends Controller
             $audio->storeAs('audio', "audio_{$timestamp}.wav", 'public');
 
             //データベースに保存する
-            Message::create([
+            $message =Message::create([
                 'thread_id' => $threadId,
                 'message_en' => $request->input('message_en', ''),
                 'message_ja' => $request->input('message_ja', ''),
@@ -24,7 +24,10 @@ class MessageController extends Controller
                 'sender' => 1,
             ]);
 
-            return response()->json(['message' => 'Audio message saved successfully.'], 201);
+            $apiService = new \App\Http\Services\ApiService();
+            $transcription = $apiService->callWhisperApi("audio/audio_{$timestamp}.wav");
+
+            return response()->json(['message' => 'Audio message saved successfully.', 'transcription' => $transcription], 201);
         }
         return response()->json(['error' => 'No audio file provided.'], 400);
     }
