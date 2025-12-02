@@ -16,7 +16,7 @@ class ApiService
                 'model' => 'whisper-1',
                 'language' => 'en',
             ]);
-        dd($response->json());
+
         if ($response->successful()) {
             return $response->json();
         } else {
