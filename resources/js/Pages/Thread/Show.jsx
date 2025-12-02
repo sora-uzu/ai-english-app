@@ -229,6 +229,16 @@ export default function ThreadShow({
                             className="h-7 w-7"
                         />
                     </button>
+                    {isUploading && (
+                        <div className="fixed inset-0 z-30 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="h-12 w-12 animate-spin rounded-full border-4 border-emerald-300/70 border-t-transparent" />
+                                <p className="text-sm font-medium text-gray-100">
+                                    送信しています...
+                                </p>
+                            </div>
+                        </div>
+                    )}
                     {recordingError && (
                         <p className="fixed bottom-28 right-10 rounded-md bg-red-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-black/30">
                             {recordingError}
