@@ -23,4 +23,38 @@ class ApiService
             throw new \Exception('Whisper API call failed: ' . $response->body());
         }
     }
+
+    public function callGptApi($modelMessages)
+    {
+        $systemMessage = [
+            'role' => 'system',
+            'content' => 'You are an English conversation practice assistant. Please respond in English.',
+        ];
+
+        $formattedMessages = [];
+        foreach ($modelMessages as $message) {
+            $role = $message->sender === 1 ? 'user' : 'assistant';
+            $formattedMessages[] = [
+                'role' => $role,
+                'content' => $message->message_en,
+            ];
+        }
+
+        $messages = array_merge([$systemMessage], $formattedMessages);
+
+        $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+                'Content-Type' => 'application/json',
+            ])
+            ->post('https://api.openai.com/v1/chat/completions', [
+                'model' => 'gpt-4o-mini',
+                'messages' => $messages,
+            ]);
+
+        if ($response->successful()) {
+            return $response->json();
+        } else {
+            throw new \Exception('GPT API call failed: ' . $response->body());
+        }
+    }
 }

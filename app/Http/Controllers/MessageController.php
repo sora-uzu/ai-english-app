@@ -28,6 +28,19 @@ class MessageController extends Controller
             $transcription = $apiService->callWhisperApi("audio/audio_{$timestamp}.wav");
             $message->update(['message_en' => $transcription['text']]);
 
+            $messages = Message::where('thread_id', $threadId)->get();
+            //gptにAPIリクエスト
+            $getResponse = $apiService->callGptApi($messages);
+            $aiMessageContent = $getResponse['choices'][0]['message']['content'];
+            //AIの返答をデータベースに保存
+            Message::create([
+                'thread_id' => $threadId,
+                'message_en' => $aiMessageContent,
+                'message_ja' => '',
+                'audio_file_path' => '',
+                'sender' => 2,
+            ]);
+
             return response()->json(['message' => 'Audio message saved successfully.', 'transcription' => $transcription], 201);
         }
         return response()->json(['error' => 'No audio file provided.'], 400);

@@ -65,7 +65,7 @@ class ThreadController extends Controller
                 'created_at',
             ])
                 ->where('thread_id', $threadId)
-                ->latest()
+                ->oldest()
                 ->get(),
             'threadId' => $threadId
         ]);
