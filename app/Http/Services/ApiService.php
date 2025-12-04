@@ -3,6 +3,7 @@
 namespace App\Http\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class ApiService
 {
@@ -43,9 +44,9 @@ class ApiService
         $messages = array_merge([$systemMessage], $formattedMessages);
 
         $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
-                'Content-Type' => 'application/json',
-            ])
+            'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+            'Content-Type' => 'application/json',
+        ])
             ->post('https://api.openai.com/v1/chat/completions', [
                 'model' => 'gpt-4o-mini',
                 'messages' => $messages,
@@ -55,6 +56,32 @@ class ApiService
             return $response->json();
         } else {
             throw new \Exception('GPT API call failed: ' . $response->body());
+        }
+    }
+
+    public function callTtsApi($text)
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . env('OPENAI_API_KEY'),
+            'Content-Type' => 'application/json',
+            'Accept' => 'audio/mpeg',
+        ])
+            ->post('https://api.openai.com/v1/audio/speech', [
+                'model' => 'gpt-4o-mini-tts',
+                'voice' => 'alloy',
+                'input' => $text,
+                'response_format' => 'wav',
+            ]);
+
+        if ($response->successful()) {
+            $fileName = 'tts_' . now()->format('YmdHis') . '.wav';
+            $filePath = 'ai_audio/' . $fileName;
+
+            Storage::disk('public')->put($filePath, $response->body());
+
+            return $filePath;
+        } else {
+            throw new \Exception('TTS API call failed: ' . $response->body());
         }
     }
 }
