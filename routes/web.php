@@ -9,6 +9,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/thread', [ThreadController::class, 'store'])->name('thread.store');
     Route::get('/thread/{threadId}', [ThreadController::class, 'show'])->name('thread.show');
     Route::post('/thread/{threadId}/message', [MessageController::class, 'store'])->name('message.store');
+    Route::post('/thread/{threadId}/message/{messageId}/translate', [MessageController::class, 'translate'])->name('message.translate');
     Route::get('/audio', [MessageController::class, 'audio'])->name('audio.stream');
 });
 

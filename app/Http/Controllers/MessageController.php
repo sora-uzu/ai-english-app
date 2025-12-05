@@ -81,4 +81,24 @@ class MessageController extends Controller
             'Cache-Control' => 'private, max-age=86400',
         ]);
     }
+
+    public function translate(Request $request, int $threadId, int $messageId)
+    {
+        $message = Message::where('thread_id', $threadId)->findOrFail($messageId);
+
+        if (!empty($message->message_ja)) {
+            return response()->json(['translation' => $message->message_ja]);
+        }
+
+        if (empty($message->message_en)) {
+            return response()->json(['error' => 'No English text to translate.'], 400);
+        }
+
+        $apiService = new \App\Http\Services\ApiService();
+        $translation = $apiService->translateToJapanese($message->message_en);
+
+        $message->update(['message_ja' => $translation]);
+
+        return response()->json(['translation' => $translation]);
+    }
 }

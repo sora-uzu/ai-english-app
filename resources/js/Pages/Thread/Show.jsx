@@ -18,6 +18,12 @@ export default function ThreadShow({
     const [recordingError, setRecordingError] = useState("");
     const [playbackError, setPlaybackError] = useState("");
     const [playingMessageId, setPlayingMessageId] = useState(null);
+    const [isJapaneseVisibleByMessage, setIsJapaneseVisibleByMessage] =
+        useState({});
+    const [translationByMessage, setTranslationByMessage] = useState({});
+    const [translationLoadingByMessage, setTranslationLoadingByMessage] =
+        useState({});
+    const [translationError, setTranslationError] = useState("");
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
     const audioPlayerRef = useRef(null);
@@ -122,6 +128,63 @@ export default function ThreadShow({
         startRecording();
     };
 
+    const fetchTranslation = async (messageId) => {
+        if (!threadId) {
+            return null;
+        }
+
+        setTranslationError("");
+        setTranslationLoadingByMessage((prev) => ({
+            ...prev,
+            [messageId]: true,
+        }));
+
+        try {
+            const response = await axios.post(
+                `/thread/${threadId}/message/${messageId}/translate`
+            );
+            const translation = response?.data?.translation ?? "";
+
+            if (translation) {
+                setTranslationByMessage((prev) => ({
+                    ...prev,
+                    [messageId]: translation,
+                }));
+            }
+
+            return translation;
+        } catch (error) {
+            console.error("翻訳に失敗しました", error);
+            setTranslationError(
+                "翻訳に失敗しました。しばらくしてから再試行してください。"
+            );
+            return null;
+        } finally {
+            setTranslationLoadingByMessage((prev) => ({
+                ...prev,
+                [messageId]: false,
+            }));
+        }
+    };
+
+    const handleToggleTranslation = async (messageId, existingTranslation) => {
+        let translationText =
+            translationByMessage[messageId] ?? existingTranslation;
+
+        if (!translationText && !translationLoadingByMessage[messageId]) {
+            translationText = await fetchTranslation(messageId);
+        }
+
+        if (!translationText) {
+            return;
+        }
+
+        setIsJapaneseVisibleByMessage((prev) => ({
+            ...prev,
+            [messageId]: !prev[messageId],
+        }));
+    };
+
     const handlePlayAudio = (audioPath, messageId) => {
         const audioUrl = getAudioUrl(audioPath);
         if (!audioUrl) {
@@ -196,11 +259,28 @@ export default function ThreadShow({
                                             message.message_ja ??
                                             message.translation ??
                                             "";
+                                        const translatedText =
+                                            translationByMessage[message.id] ??
+                                            japaneseText;
                                         const audioUrl = getAudioUrl(
                                             message.audio_file_path
                                         );
                                         const isPlaying =
                                             playingMessageId === message.id;
+                                        const isJapaneseVisible =
+                                            !!isJapaneseVisibleByMessage[
+                                                message.id
+                                            ];
+                                        const hasJapaneseText =
+                                            Boolean(translatedText);
+                                        const displayedText =
+                                            isJapaneseVisible && hasJapaneseText
+                                                ? translatedText
+                                                : englishText;
+                                        const isTranslating =
+                                            !!translationLoadingByMessage[
+                                                message.id
+                                            ];
 
                                         return isUserMessage ? (
                                             <div
@@ -234,13 +314,8 @@ export default function ThreadShow({
                                                     </span>
                                                     <div className="max-w-lg rounded-3xl bg-gray-100 px-6 py-4 text-base font-medium text-gray-900 shadow-lg shadow-black/20">
                                                         <p className="leading-relaxed">
-                                                            {englishText}
+                                                            {displayedText}
                                                         </p>
-                                                        {japaneseText && (
-                                                            <p className="mt-2 text-sm font-normal text-gray-600">
-                                                                {japaneseText}
-                                                            </p>
-                                                        )}
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <button
@@ -272,10 +347,44 @@ export default function ThreadShow({
                                                             />
                                                         </button>
                                                         <button
-                                                            className="rounded-2xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm shadow-black/10 transition hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-white/60"
+                                                            aria-label={
+                                                                isJapaneseVisible
+                                                                    ? "英語に戻す"
+                                                                    : "日本語訳を表示"
+                                                            }
+                                                            aria-pressed={
+                                                                isJapaneseVisible
+                                                            }
+                                                            aria-busy={
+                                                                isTranslating
+                                                            }
+                                                            className={`rounded-2xl px-4 py-2 text-sm font-semibold shadow-sm shadow-black/10 transition focus:outline-none focus:ring-2 focus:ring-white/60 ${
+                                                                isJapaneseVisible
+                                                                    ? "bg-emerald-300 text-gray-900"
+                                                                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                                                            } ${
+                                                                !hasJapaneseText
+                                                                    ? "opacity-60"
+                                                                    : ""
+                                                            } ${
+                                                                isTranslating
+                                                                    ? "animate-pulse"
+                                                                    : ""
+                                                            }`}
+                                                            disabled={
+                                                                isTranslating
+                                                            }
                                                             type="button"
+                                                            onClick={() =>
+                                                                handleToggleTranslation(
+                                                                    message.id,
+                                                                    japaneseText
+                                                                )
+                                                            }
                                                         >
-                                                            Aあ
+                                                            {isTranslating
+                                                                ? "..."
+                                                                : "Aあ"}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -325,6 +434,11 @@ export default function ThreadShow({
                     {playbackError && (
                         <p className="fixed bottom-36 right-10 rounded-md bg-red-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-black/30">
                             {playbackError}
+                        </p>
+                    )}
+                    {translationError && (
+                        <p className="fixed bottom-44 right-10 rounded-md bg-red-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-black/30">
+                            {translationError}
                         </p>
                     )}
                 </main>
