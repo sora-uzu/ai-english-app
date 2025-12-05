@@ -27,6 +27,7 @@ export default function ThreadShow({
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
     const audioPlayerRef = useRef(null);
+    const messagesContainerRef = useRef(null);
 
     const getAudioUrl = (audioPath) => {
         if (!audioPath) {
@@ -227,6 +228,15 @@ export default function ThreadShow({
         };
     }, []);
 
+    useEffect(() => {
+        const container = messagesContainerRef.current;
+        if (!container) {
+            return;
+        }
+
+        container.scrollTop = container.scrollHeight;
+    }, [messages?.length]);
+
     return (
         <>
             <Head title="Thread Show" />
@@ -242,7 +252,10 @@ export default function ThreadShow({
                         <LogoutButton />
                     </header>
                     <section className="mt-12 flex flex-1 flex-col overflow-hidden">
-                        <div className="flex-1 overflow-y-auto pr-24">
+                        <div
+                            ref={messagesContainerRef}
+                            className="flex-1 overflow-y-auto pr-24"
+                        >
                             <div className="flex flex-col gap-6">
                                 {hasMessages ? (
                                     messages.map((message) => {
