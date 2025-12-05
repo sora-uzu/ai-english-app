@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Head } from "@inertiajs/react";
 import { FiMic, FiVolume2 } from "react-icons/fi";
@@ -16,8 +16,21 @@ export default function ThreadShow({
     const [isRecording, setIsRecording] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [recordingError, setRecordingError] = useState("");
+    const [playbackError, setPlaybackError] = useState("");
+    const [playingMessageId, setPlayingMessageId] = useState(null);
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
+    const audioPlayerRef = useRef(null);
+
+    const getAudioUrl = (audioPath) => {
+        if (!audioPath) {
+            return null;
+        }
+
+        return audioPath.startsWith("http")
+            ? audioPath
+            : `/audio?path=${encodeURIComponent(audioPath)}`;
+    };
 
     const uploadRecording = async () => {
         if (!threadId || audioChunksRef.current.length === 0) {
@@ -109,6 +122,48 @@ export default function ThreadShow({
         startRecording();
     };
 
+    const handlePlayAudio = (audioPath, messageId) => {
+        const audioUrl = getAudioUrl(audioPath);
+        if (!audioUrl) {
+            return;
+        }
+
+        setPlaybackError("");
+
+        try {
+            if (audioPlayerRef.current) {
+                audioPlayerRef.current.pause();
+                audioPlayerRef.current.currentTime = 0;
+            }
+
+            const audio = new Audio(audioUrl);
+            audioPlayerRef.current = audio;
+            setPlayingMessageId(messageId);
+
+            audio.onended = () => {
+                setPlayingMessageId(null);
+            };
+
+            audio.play().catch((error) => {
+                console.error("音声の再生に失敗しました", error);
+                setPlaybackError("音声の再生に失敗しました。");
+                setPlayingMessageId(null);
+            });
+        } catch (error) {
+            console.error("音声の再生に失敗しました", error);
+            setPlaybackError("音声の再生に失敗しました。");
+            setPlayingMessageId(null);
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            if (audioPlayerRef.current) {
+                audioPlayerRef.current.pause();
+            }
+        };
+    }, []);
+
     return (
         <>
             <Head title="Thread Show" />
@@ -141,6 +196,11 @@ export default function ThreadShow({
                                             message.message_ja ??
                                             message.translation ??
                                             "";
+                                        const audioUrl = getAudioUrl(
+                                            message.audio_file_path
+                                        );
+                                        const isPlaying =
+                                            playingMessageId === message.id;
 
                                         return isUserMessage ? (
                                             <div
@@ -185,8 +245,26 @@ export default function ThreadShow({
                                                     <div className="flex items-center gap-2">
                                                         <button
                                                             aria-label="再生する"
-                                                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-800 shadow-sm shadow-black/10 transition hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-white/60"
+                                                            aria-pressed={
+                                                                isPlaying
+                                                            }
+                                                            className={`flex h-10 w-10 items-center justify-center rounded-full shadow-sm shadow-black/10 transition focus:outline-none focus:ring-2 focus:ring-white/60 ${
+                                                                isPlaying
+                                                                    ? "bg-emerald-400 text-gray-900"
+                                                                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                                                            } ${
+                                                                !audioUrl
+                                                                    ? "opacity-60"
+                                                                    : ""
+                                                            }`}
+                                                            disabled={!audioUrl}
                                                             type="button"
+                                                            onClick={() =>
+                                                                handlePlayAudio(
+                                                                    message.audio_file_path,
+                                                                    message.id
+                                                                )
+                                                            }
                                                         >
                                                             <FiVolume2
                                                                 aria-hidden="true"
@@ -242,6 +320,11 @@ export default function ThreadShow({
                     {recordingError && (
                         <p className="fixed bottom-28 right-10 rounded-md bg-red-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-black/30">
                             {recordingError}
+                        </p>
+                    )}
+                    {playbackError && (
+                        <p className="fixed bottom-36 right-10 rounded-md bg-red-500/90 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-black/30">
+                            {playbackError}
                         </p>
                     )}
                 </main>

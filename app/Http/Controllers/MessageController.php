@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Message;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class MessageController extends Controller
 {
@@ -50,5 +52,33 @@ class MessageController extends Controller
             return response()->json(['message' => 'Audio message saved successfully.', 'transcription' => $transcription], 201);
         }
         return response()->json(['error' => 'No audio file provided.'], 400);
+    }
+
+    /**
+     * ログイン済みユーザー向けの音声ストリーミング
+     */
+    public function audio(Request $request)
+    {
+        $path = $request->query('path');
+
+        if (!$path) {
+            abort(404);
+        }
+
+        $normalizedPath = ltrim($path, '/');
+        if (!Str::startsWith($normalizedPath, ['audio/', 'ai_audio/'])) {
+            abort(404);
+        }
+
+        if (!Storage::disk('public')->exists($normalizedPath)) {
+            abort(404);
+        }
+
+        $fullPath = Storage::disk('public')->path($normalizedPath);
+
+        return response()->file($fullPath, [
+            'Content-Type' => 'audio/wav',
+            'Cache-Control' => 'private, max-age=86400',
+        ]);
     }
 }
